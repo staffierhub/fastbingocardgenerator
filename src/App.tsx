@@ -3,9 +3,10 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
-import { createContext, useContext, useEffect, useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
+import { AuthContext } from "@/contexts/AuthContext";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import MyCards from "./pages/MyCards";
@@ -13,9 +14,6 @@ import Landing from "./pages/Landing";
 import Templates from "./pages/Templates";
 
 const queryClient = new QueryClient();
-
-// Create a context for the auth session
-const AuthContext = createContext<{ session: Session | null }>({ session: null });
 
 // Protected Route component
 const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
