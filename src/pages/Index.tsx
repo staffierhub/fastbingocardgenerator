@@ -38,6 +38,24 @@ export default function Index() {
     }
   };
 
+  const handleRandomize = () => {
+    if (cardType === "traditional") {
+      // Force a re-render of the BingoCard component
+      setIncludeFreeSpace(prev => !prev);
+      setIncludeFreeSpace(prev => !prev);
+    } else {
+      setBingoContent(prev => [...shuffleArray(prev)]);
+    }
+    toast({
+      title: "Card randomized!",
+      duration: 2000,
+    });
+  };
+
+  const shuffleArray = <T,>(array: T[]): T[] => {
+    return [...array].sort(() => Math.random() - 0.5);
+  };
+
   return (
     <div className="min-h-screen p-4 bg-[#EEF6FF]">
       <header className="flex justify-between items-center mb-8">
@@ -66,14 +84,9 @@ export default function Index() {
               <Button
                 variant="secondary"
                 className="w-full"
-                onClick={() => {
-                  toast({
-                    title: "Coming soon!",
-                    duration: 2000,
-                  });
-                }}
+                onClick={handleRandomize}
               >
-                Generate Random Card
+                Shuffle Card
               </Button>
               <Button
                 variant="secondary"
@@ -96,6 +109,8 @@ export default function Index() {
           showTitle={showTitle}
           includeFreeSpace={includeFreeSpace}
           bingoContent={bingoContent}
+          gridSize={gridSize}
+          cardType={cardType}
         />
       </main>
     </div>
