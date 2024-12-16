@@ -36,8 +36,17 @@ const Login = () => {
     return () => subscription.unsubscribe();
   }, [navigate]);
 
+  const handleSignUpClick = (e: any) => {
+    // Find any element containing "sign up" (case insensitive)
+    const target = e.target as HTMLElement;
+    if (target.textContent?.toLowerCase().includes('sign up')) {
+      e.preventDefault();
+      window.location.href = 'https://buy.stripe.com/6oE4gvakvcZL8rC6oo';
+    }
+  };
+
   return (
-    <div className="min-h-screen flex items-center justify-center bg-[#F5F4F4]">
+    <div className="min-h-screen flex items-center justify-center bg-[#F5F4F4]" onClick={handleSignUpClick}>
       <div className="w-full max-w-md p-8 bg-white rounded-lg shadow-lg">
         <h1 className="text-3xl font-bold text-center mb-8 text-[#5BB6EE]">Bingo Bliss</h1>
         <Auth
