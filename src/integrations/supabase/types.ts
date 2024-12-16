@@ -9,6 +9,45 @@ export type Json =
 export type Database = {
   public: {
     Tables: {
+      bingo_cards: {
+        Row: {
+          card_type: string
+          content: Json
+          created_at: string
+          grid_size: string
+          id: string
+          include_free_space: boolean | null
+          show_title: boolean | null
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          card_type: string
+          content: Json
+          created_at?: string
+          grid_size: string
+          id?: string
+          include_free_space?: boolean | null
+          show_title?: boolean | null
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          card_type?: string
+          content?: Json
+          created_at?: string
+          grid_size?: string
+          id?: string
+          include_free_space?: boolean | null
+          show_title?: boolean | null
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

@@ -19,6 +19,7 @@ export default function Index() {
   const [showTitle, setShowTitle] = useState(true);
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
   const [bingoContent, setBingoContent] = useState<string[]>([]);
+  const [isSaving, setIsSaving] = useState(false);
 
   // Update grid size when card type changes
   useEffect(() => {
@@ -61,6 +62,50 @@ export default function Index() {
     });
   };
 
+  const handleSave = async () => {
+    try {
+      setIsSaving(true);
+      const { data: { user } } = await supabase.auth.getUser();
+      
+      if (!user) {
+        toast({
+          title: "Please log in to save cards",
+          variant: "destructive",
+          duration: 2000,
+        });
+        return;
+      }
+
+      const { error } = await supabase
+        .from('bingo_cards')
+        .insert({
+          user_id: user.id,
+          title,
+          grid_size: gridSize,
+          card_type: cardType,
+          content: bingoContent,
+          show_title: showTitle,
+          include_free_space: includeFreeSpace,
+        });
+
+      if (error) throw error;
+
+      toast({
+        title: "Card saved successfully!",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Error saving card:', error);
+      toast({
+        title: "Error saving card",
+        variant: "destructive",
+        duration: 2000,
+      });
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   const shuffleArray = <T,>(array: T[]): T[] => {
     return [...array].sort(() => Math.random() - 0.5);
   };
@@ -101,6 +146,14 @@ export default function Index() {
                 onClick={handleRandomize}
               >
                 Shuffle Card
+              </Button>
+              <Button
+                variant="secondary"
+                className="w-full"
+                onClick={handleSave}
+                disabled={isSaving}
+              >
+                {isSaving ? "Saving..." : "Save Card"}
               </Button>
               <Button
                 variant="secondary"
