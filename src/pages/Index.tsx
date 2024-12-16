@@ -1,15 +1,15 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate, Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { BingoCard } from "@/components/bingo/BingoCard";
 import { CardTypeSelector } from "@/components/bingo/CardTypeSelector";
 import { GridSizeSelector } from "@/components/bingo/GridSizeSelector";
 import { CardSettings } from "@/components/bingo/CardSettings";
 import { AIGenerator } from "@/components/bingo/AIGenerator";
-import { FileText } from "lucide-react";
+import { BackgroundUploader } from "@/components/bingo/BackgroundUploader";
 import { Navigation } from "@/components/layout/Navigation";
 
 export default function Index() {
@@ -22,14 +22,7 @@ export default function Index() {
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
   const [bingoContent, setBingoContent] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    if (cardType === "custom") {
-      setGridSize("3x3");
-    } else {
-      setGridSize("75-ball");
-    }
-  }, [cardType]);
+  const [backgroundUrl, setBackgroundUrl] = useState<string>("");
 
   const handleLogout = async () => {
     try {
@@ -135,6 +128,7 @@ export default function Index() {
             {cardType === "custom" && (
               <AIGenerator setBingoContent={setBingoContent} />
             )}
+            <BackgroundUploader onBackgroundChange={setBackgroundUrl} />
             <div className="mt-4 space-y-2">
               <Button
                 variant="secondary"
@@ -162,6 +156,7 @@ export default function Index() {
           bingoContent={bingoContent}
           gridSize={gridSize}
           cardType={cardType}
+          backgroundUrl={backgroundUrl}
         />
       </main>
     </div>

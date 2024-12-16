@@ -14,6 +14,7 @@ interface BingoCardProps {
   bingoContent: string[];
   gridSize: string;
   cardType: string;
+  backgroundUrl?: string;
 }
 
 export const BingoCard = ({ 
@@ -22,7 +23,8 @@ export const BingoCard = ({
   includeFreeSpace, 
   bingoContent,
   gridSize,
-  cardType 
+  cardType,
+  backgroundUrl 
 }: BingoCardProps) => {
   const getGridSize = () => {
     if (cardType === "traditional") {
@@ -49,8 +51,14 @@ export const BingoCard = ({
         isBlank: false
       } as BingoCell));
 
+  const cardStyle = {
+    backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : 'none',
+    backgroundSize: 'cover',
+    backgroundPosition: 'center',
+  };
+
   return (
-    <Card className="p-8 bg-[#F7C052]">
+    <Card className="p-8 bg-[#F7C052]" style={cardStyle}>
       <div className="aspect-square">
         {showTitle && (
           <h2 className="text-3xl font-bold text-center mb-8">{title}</h2>
@@ -66,10 +74,10 @@ export const BingoCard = ({
             <div
               key={index}
               className={`
-                bg-white rounded-lg flex items-center justify-center p-2 
+                bg-white/90 backdrop-blur-sm rounded-lg flex items-center justify-center p-2 
                 text-center text-sm border-2 border-gray-200
-                ${cell.isBlank ? 'bg-gray-100' : ''}
-                ${cell.isFreeSpace ? 'bg-yellow-100' : ''}
+                ${cell.isBlank ? 'bg-gray-100/90' : ''}
+                ${cell.isFreeSpace ? 'bg-yellow-100/90' : ''}
               `}
             >
               {cell.value}
