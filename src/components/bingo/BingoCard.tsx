@@ -35,6 +35,7 @@ export const BingoCard = ({
         default: return 5;
       }
     } else {
+      // For custom cards, parse the size from the format "3x3", "4x4", etc.
       return parseInt(gridSize.split('x')[0]);
     }
   };
