@@ -1,5 +1,6 @@
 import { Card } from "@/components/ui/card";
 import { generateBingoGrid } from "@/utils/bingoGridGenerator";
+import { useState } from "react";
 
 interface BingoCell {
   value: string | number;
@@ -41,13 +42,24 @@ export const BingoCard = ({
   const size = getGridSize();
   const totalCells = size * size;
 
-  const grid = cardType === "traditional" 
+  const initialGrid = cardType === "traditional" 
     ? generateBingoGrid(gridSize as any, includeFreeSpace)
     : Array(totalCells).fill(null).map((_, index) => ({
         value: bingoContent[index] || "",
         isFreeSpace: includeFreeSpace && index === Math.floor(totalCells / 2),
         isBlank: false
       } as BingoCell));
+
+  const [grid, setGrid] = useState(initialGrid);
+
+  const handleCellEdit = (index: number, newValue: string) => {
+    const newGrid = [...grid.flat()];
+    newGrid[index] = {
+      ...newGrid[index],
+      value: newValue
+    };
+    setGrid(newGrid.map(cell => [cell]));
+  };
 
   return (
     <Card className="p-8 bg-[#F7C052]">
@@ -72,7 +84,13 @@ export const BingoCard = ({
                 ${cell.isFreeSpace ? 'bg-yellow-100' : ''}
               `}
             >
-              {cell.value}
+              <input
+                type="text"
+                value={cell.value}
+                onChange={(e) => handleCellEdit(index, e.target.value)}
+                className="w-full h-full text-center bg-transparent focus:outline-none"
+                disabled={cell.isFreeSpace}
+              />
             </div>
           ))}
         </div>
