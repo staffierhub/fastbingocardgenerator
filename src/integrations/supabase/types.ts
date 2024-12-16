@@ -11,6 +11,7 @@ export type Database = {
     Tables: {
       bingo_cards: {
         Row: {
+          background_url: string | null
           card_type: string
           content: Json
           created_at: string
@@ -23,6 +24,7 @@ export type Database = {
           user_id: string
         }
         Insert: {
+          background_url?: string | null
           card_type: string
           content: Json
           created_at?: string
@@ -35,6 +37,7 @@ export type Database = {
           user_id: string
         }
         Update: {
+          background_url?: string | null
           card_type?: string
           content?: Json
           created_at?: string

@@ -44,7 +44,6 @@ export default function Index() {
 
   const handleRandomize = () => {
     if (cardType === "traditional") {
-      // Force a re-render of the BingoCard component
       setIncludeFreeSpace(prev => !prev);
       setIncludeFreeSpace(prev => !prev);
     } else {
@@ -80,6 +79,7 @@ export default function Index() {
           content: bingoContent,
           show_title: showTitle,
           include_free_space: includeFreeSpace,
+          background_url: backgroundUrl,
         });
 
       if (error) throw error;

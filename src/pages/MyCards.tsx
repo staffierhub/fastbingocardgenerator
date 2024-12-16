@@ -15,6 +15,7 @@ interface BingoCardData {
   content: string[];
   show_title: boolean;
   include_free_space: boolean;
+  background_url: string;
 }
 
 export default function MyCards() {
@@ -91,6 +92,7 @@ export default function MyCards() {
                     bingoContent={card.content}
                     gridSize={card.grid_size}
                     cardType={card.card_type}
+                    backgroundUrl={card.background_url}
                   />
                 </div>
                 <Button 
