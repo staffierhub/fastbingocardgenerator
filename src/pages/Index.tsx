@@ -1,7 +1,7 @@
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useState, useEffect } from "react";
 import { BingoCard } from "@/components/bingo/BingoCard";
@@ -9,6 +9,7 @@ import { CardTypeSelector } from "@/components/bingo/CardTypeSelector";
 import { GridSizeSelector } from "@/components/bingo/GridSizeSelector";
 import { CardSettings } from "@/components/bingo/CardSettings";
 import { AIGenerator } from "@/components/bingo/AIGenerator";
+import { FileText } from "lucide-react";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -114,9 +115,17 @@ export default function Index() {
     <div className="min-h-screen p-4 bg-[#EEF6FF]">
       <header className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-[#5BB6EE]">Bingo Bliss</h1>
-        <Button onClick={handleLogout} variant="outline">
-          Logout
-        </Button>
+        <div className="flex gap-4">
+          <Link to="/my-cards">
+            <Button variant="outline" className="flex items-center gap-2">
+              <FileText className="h-4 w-4" />
+              My Cards
+            </Button>
+          </Link>
+          <Button onClick={handleLogout} variant="outline">
+            Logout
+          </Button>
+        </div>
       </header>
 
       <main className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[350px,1fr] gap-8">
