@@ -46,7 +46,7 @@ export default function Templates() {
                 title={template.title}
                 showTitle={template.show_title}
                 includeFreeSpace={template.include_free_space}
-                bingoContent={template.content}
+                bingoContent={template.content as string[]}
                 gridSize={template.grid_size}
                 cardType={template.card_type}
                 backgroundUrl={template.background_url}
