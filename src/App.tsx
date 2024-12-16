@@ -47,11 +47,11 @@ const App = () => {
 
   return (
     <QueryClientProvider client={queryClient}>
-      <AuthContext.Provider value={{ session }}>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
+      <BrowserRouter>
+        <AuthContext.Provider value={{ session }}>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
             <Routes>
               <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
@@ -80,9 +80,9 @@ const App = () => {
                 }
               />
             </Routes>
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthContext.Provider>
+          </TooltipProvider>
+        </AuthContext.Provider>
+      </BrowserRouter>
     </QueryClientProvider>
   );
 };
