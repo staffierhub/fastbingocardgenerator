@@ -3,7 +3,7 @@ import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { BingoCard } from "@/components/bingo/BingoCard";
 import { CardTypeSelector } from "@/components/bingo/CardTypeSelector";
 import { GridSizeSelector } from "@/components/bingo/GridSizeSelector";
@@ -19,6 +19,15 @@ export default function Index() {
   const [showTitle, setShowTitle] = useState(true);
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
   const [bingoContent, setBingoContent] = useState<string[]>([]);
+
+  // Update grid size when card type changes
+  useEffect(() => {
+    if (cardType === "custom") {
+      setGridSize("3x3");
+    } else {
+      setGridSize("75-ball");
+    }
+  }, [cardType]);
 
   const handleLogout = async () => {
     try {
@@ -69,7 +78,11 @@ export default function Index() {
         <div className="space-y-6">
           <Card className="p-6">
             <CardTypeSelector cardType={cardType} setCardType={setCardType} />
-            <GridSizeSelector gridSize={gridSize} setGridSize={setGridSize} />
+            <GridSizeSelector 
+              gridSize={gridSize} 
+              setGridSize={setGridSize} 
+              cardType={cardType}
+            />
             <CardSettings
               title={title}
               setTitle={setTitle}
@@ -78,8 +91,9 @@ export default function Index() {
               includeFreeSpace={includeFreeSpace}
               setIncludeFreeSpace={setIncludeFreeSpace}
             />
-            <AIGenerator setBingoContent={setBingoContent} />
-
+            {cardType === "custom" && (
+              <AIGenerator setBingoContent={setBingoContent} />
+            )}
             <div className="mt-4 space-y-2">
               <Button
                 variant="secondary"

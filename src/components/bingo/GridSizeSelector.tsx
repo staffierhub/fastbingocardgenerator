@@ -4,22 +4,28 @@ import { Label } from "@/components/ui/label";
 interface GridSizeSelectorProps {
   gridSize: string;
   setGridSize: (size: string) => void;
+  cardType: string;
 }
 
-export const GridSizeSelector = ({ gridSize, setGridSize }: GridSizeSelectorProps) => {
+export const GridSizeSelector = ({ gridSize, setGridSize, cardType }: GridSizeSelectorProps) => {
+  const sizes = cardType === "traditional" 
+    ? ["30-ball", "75-ball", "80-ball", "90-ball"]
+    : ["3x3", "4x4", "5x5"];
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Grid Size</h2>
       <p className="text-sm text-gray-600 mb-4">
-        Select a traditional bingo game variant to automatically set the
-        appropriate grid size.
+        {cardType === "traditional" 
+          ? "Select a traditional bingo game variant to automatically set the appropriate grid size."
+          : "Select a custom grid size for your bingo card."}
       </p>
       <RadioGroup
         value={gridSize}
         onValueChange={setGridSize}
         className="grid grid-cols-2 gap-4"
       >
-        {["30-ball", "75-ball", "80-ball", "90-ball"].map((size) => (
+        {sizes.map((size) => (
           <div key={size}>
             <RadioGroupItem
               value={size}
@@ -28,7 +34,7 @@ export const GridSizeSelector = ({ gridSize, setGridSize }: GridSizeSelectorProp
             />
             <Label
               htmlFor={size}
-              className="flex flex-col items-center justify-center rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
+              className="flex flex-col items-center justify-between rounded-md border-2 border-muted bg-white p-4 hover:bg-gray-50 peer-data-[state=checked]:border-primary [&:has([data-state=checked])]:border-primary"
             >
               {size}
             </Label>

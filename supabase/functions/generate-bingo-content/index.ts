@@ -1,6 +1,8 @@
 import "https://deno.land/x/xhr@0.1.0/mod.ts";
 import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
 
+const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
+
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Headers': 'authorization, x-client-info, apikey, content-type',
@@ -12,12 +14,9 @@ serve(async (req) => {
   }
 
   try {
-    const { theme } = await req.json();
-    const openAIApiKey = Deno.env.get('OPENAI_API_KEY');
-
-    if (!openAIApiKey) {
-      throw new Error('OpenAI API key not found');
-    }
+    const { theme, gridSize = "3x3" } = await req.json();
+    const size = parseInt(gridSize.split('x')[0]);
+    const totalItems = size * size;
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -30,11 +29,11 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: 'You are a helpful assistant that generates bingo card content. Generate content as a JSON array of 24 unique strings (leaving space for the FREE square in the middle).'
+            content: `You are a helpful assistant that generates bingo card content. Generate content as a JSON array of ${totalItems} unique strings (if free space is enabled, one less item will be needed).`
           },
           {
             role: 'user',
-            content: `Generate 24 unique bingo squares content for a ${theme} themed bingo game. Return only a JSON array of strings, nothing else.`
+            content: `Generate ${totalItems} unique bingo squares content for a ${theme} themed bingo game. Return only a JSON array of strings, nothing else.`
           }
         ],
       }),

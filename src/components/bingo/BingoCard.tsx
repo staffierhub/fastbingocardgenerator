@@ -24,26 +24,28 @@ export const BingoCard = ({
   gridSize,
   cardType 
 }: BingoCardProps) => {
-  const getGridTemplateColumns = () => {
-    switch (gridSize) {
-      case "30-ball":
-        return "repeat(3, 1fr)";
-      case "75-ball":
-        return "repeat(5, 1fr)";
-      case "80-ball":
-        return "repeat(4, 1fr)";
-      case "90-ball":
-        return "repeat(9, 1fr)";
-      default:
-        return "repeat(5, 1fr)";
+  const getGridSize = () => {
+    if (cardType === "traditional") {
+      switch (gridSize) {
+        case "30-ball": return 3;
+        case "75-ball": return 5;
+        case "80-ball": return 4;
+        case "90-ball": return 9;
+        default: return 5;
+      }
+    } else {
+      return parseInt(gridSize.split('x')[0]);
     }
   };
 
+  const size = getGridSize();
+  const totalCells = size * size;
+
   const grid = cardType === "traditional" 
     ? generateBingoGrid(gridSize as any, includeFreeSpace)
-    : Array(25).fill(null).map((_, index) => ({
+    : Array(totalCells).fill(null).map((_, index) => ({
         value: bingoContent[index] || "",
-        isFreeSpace: includeFreeSpace && index === 12,
+        isFreeSpace: includeFreeSpace && index === Math.floor(totalCells / 2),
         isBlank: false
       } as BingoCell));
 
@@ -56,8 +58,8 @@ export const BingoCard = ({
         <div 
           className="grid gap-4 h-full" 
           style={{ 
-            gridTemplateColumns: getGridTemplateColumns(),
-            gridTemplateRows: getGridTemplateColumns()
+            gridTemplateColumns: `repeat(${size}, 1fr)`,
+            gridTemplateRows: `repeat(${size}, 1fr)`
           }}
         >
           {grid.flat().map((cell, index) => (
