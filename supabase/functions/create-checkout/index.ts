@@ -19,10 +19,20 @@ serve(async (req) => {
   )
 
   try {
+    console.log('Starting checkout process...')
+    
     // Get the session or user object
-    const authHeader = req.headers.get('Authorization')!
+    const authHeader = req.headers.get('Authorization')
+    if (!authHeader) {
+      throw new Error('No authorization header')
+    }
+    
     const token = authHeader.replace('Bearer ', '')
-    const { data } = await supabaseClient.auth.getUser(token)
+    console.log('Got auth token, fetching user...')
+    
+    const { data, error: userError } = await supabaseClient.auth.getUser(token)
+    if (userError) throw userError
+    
     const user = data.user
     const email = user?.email
 
@@ -30,10 +40,13 @@ serve(async (req) => {
       throw new Error('No email found')
     }
 
+    console.log('Found user email:', email)
+
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
+    console.log('Checking for existing customer...')
     const customers = await stripe.customers.list({
       email: email,
       limit: 1
@@ -42,6 +55,8 @@ serve(async (req) => {
     let customer_id = undefined
     if (customers.data.length > 0) {
       customer_id = customers.data[0].id
+      console.log('Found existing customer:', customer_id)
+      
       // check if already subscribed to this price
       const subscriptions = await stripe.subscriptions.list({
         customer: customers.data[0].id,
@@ -55,7 +70,7 @@ serve(async (req) => {
       }
     }
 
-    console.log('Creating payment session...')
+    console.log('Creating checkout session...')
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
       customer_email: customer_id ? undefined : email,
@@ -70,7 +85,7 @@ serve(async (req) => {
       cancel_url: `${req.headers.get('origin')}/generator`,
     })
 
-    console.log('Payment session created:', session.id)
+    console.log('Checkout session created:', session.id)
     return new Response(
       JSON.stringify({ url: session.url }),
       { 
@@ -79,12 +94,12 @@ serve(async (req) => {
       }
     )
   } catch (error) {
-    console.error('Error creating payment session:', error)
+    console.error('Error in checkout process:', error)
     return new Response(
       JSON.stringify({ error: error.message }),
       { 
         headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-        status: 500,
+        status: 400,
       }
     )
   }
