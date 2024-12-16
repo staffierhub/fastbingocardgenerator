@@ -5,8 +5,9 @@ import { Link } from "react-router-dom";
 import { Loader2, Plus } from "lucide-react";
 import { Navigation } from "@/components/layout/Navigation";
 import { toast } from "sonner";
-import { CardGrid } from "@/components/bingo/CardGrid";
+import { CardGrid, BingoCardData } from "@/components/bingo/CardGrid";
 import { useEffect, useState } from "react";
+import { Json } from "@/integrations/supabase/types";
 
 export default function MyCards() {
   const queryClient = useQueryClient();
@@ -33,11 +34,13 @@ export default function MyCards() {
       // Transform the data to ensure content is always a string array
       return data.map(card => ({
         ...card,
-        content: Array.isArray(card.content) ? card.content : [],
+        content: Array.isArray(card.content) 
+          ? card.content.map(item => String(item)) // Convert each item to string
+          : [],
         background_url: card.background_url || null,
         show_title: card.show_title ?? true,
         include_free_space: card.include_free_space ?? true
-      }));
+      })) as BingoCardData[];
     },
   });
 
