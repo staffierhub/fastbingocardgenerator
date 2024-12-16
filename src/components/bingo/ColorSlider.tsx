@@ -5,11 +5,13 @@ import { useState, useEffect } from "react";
 interface ColorSliderProps {
   backgroundColor: string;
   onBackgroundColorChange: (color: string) => void;
+  disabled?: boolean;
 }
 
 export const ColorSlider = ({
   backgroundColor,
   onBackgroundColorChange,
+  disabled,
 }: ColorSliderProps) => {
   const [hue, setHue] = useState(0);
   const [saturation, setSaturation] = useState(100);
@@ -117,6 +119,7 @@ export const ColorSlider = ({
             max={360}
             step={1}
             className="[&>.relative>.absolute]:bg-gradient-to-r from-red-500 via-yellow-500 via-green-500 via-blue-500 to-purple-500"
+            disabled={disabled}
           />
         </div>
         
@@ -130,6 +133,7 @@ export const ColorSlider = ({
             onValueChange={(values) => setSaturation(values[0])}
             max={100}
             step={1}
+            disabled={disabled}
           />
         </div>
         
@@ -143,6 +147,7 @@ export const ColorSlider = ({
             onValueChange={(values) => setLightness(values[0])}
             max={100}
             step={1}
+            disabled={disabled}
           />
         </div>
 

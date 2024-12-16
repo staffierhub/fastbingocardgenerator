@@ -6,9 +6,10 @@ import { Upload } from "lucide-react";
 
 interface BackgroundUploaderProps {
   onBackgroundChange: (url: string) => void;
+  disabled?: boolean;
 }
 
-export const BackgroundUploader = ({ onBackgroundChange }: BackgroundUploaderProps) => {
+export const BackgroundUploader = ({ onBackgroundChange, disabled }: BackgroundUploaderProps) => {
   const { toast } = useToast();
   const [isUploading, setIsUploading] = useState(false);
 
@@ -78,7 +79,7 @@ export const BackgroundUploader = ({ onBackgroundChange }: BackgroundUploaderPro
       <Button
         variant="outline"
         className="w-full bg-white hover:bg-gray-50"
-        disabled={isUploading}
+        disabled={isUploading || disabled}
       >
         <label className="flex items-center justify-center w-full cursor-pointer">
           <Upload className="w-4 h-4 mr-2" />
@@ -88,7 +89,7 @@ export const BackgroundUploader = ({ onBackgroundChange }: BackgroundUploaderPro
             accept="image/jpeg,image/png,image/heic"
             className="hidden"
             onChange={handleUpload}
-            disabled={isUploading}
+            disabled={isUploading || disabled}
           />
         </label>
       </Button>

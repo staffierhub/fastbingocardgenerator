@@ -4,9 +4,10 @@ interface CardTypeSelectorProps {
   cardType: string;
   setCardType: (type: string) => void;
   setGridSize: (size: string) => void;
+  disabled?: boolean;
 }
 
-export const CardTypeSelector = ({ cardType, setCardType, setGridSize }: CardTypeSelectorProps) => {
+export const CardTypeSelector = ({ cardType, setCardType, setGridSize, disabled }: CardTypeSelectorProps) => {
   const handleTypeChange = (type: string) => {
     setCardType(type);
     if (type === "custom") {
@@ -28,6 +29,7 @@ export const CardTypeSelector = ({ cardType, setCardType, setGridSize }: CardTyp
           variant={cardType === "custom" ? "default" : "outline"}
           onClick={() => handleTypeChange("custom")}
           className="h-24"
+          disabled={disabled}
         >
           <div className="text-center">
             <div className="mb-2">≡</div>
@@ -38,6 +40,7 @@ export const CardTypeSelector = ({ cardType, setCardType, setGridSize }: CardTyp
           variant={cardType === "traditional" ? "default" : "outline"}
           onClick={() => handleTypeChange("traditional")}
           className="h-24"
+          disabled={disabled}
         >
           <div className="text-center">
             <div className="mb-2">#</div>

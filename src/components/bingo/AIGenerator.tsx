@@ -6,9 +6,10 @@ import { supabase } from "@/integrations/supabase/client";
 
 interface AIGeneratorProps {
   setBingoContent: (content: string[]) => void;
+  disabled?: boolean;
 }
 
-export const AIGenerator = ({ setBingoContent }: AIGeneratorProps) => {
+export const AIGenerator = ({ setBingoContent, disabled }: AIGeneratorProps) => {
   const { toast } = useToast();
   const [theme, setTheme] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
@@ -56,10 +57,11 @@ export const AIGenerator = ({ setBingoContent }: AIGeneratorProps) => {
         value={theme}
         onChange={(e) => setTheme(e.target.value)}
         className="mb-2"
+        disabled={disabled}
       />
       <Button
         onClick={generateBingoContent}
-        disabled={isGenerating}
+        disabled={isGenerating || disabled}
         className="w-full bg-[#5BB6EE] hover:bg-[#4A92BE]"
       >
         {isGenerating ? "Generating..." : "Generate Bingo Card!"}

@@ -9,6 +9,7 @@ interface CardSettingsProps {
   setShowTitle: (show: boolean) => void;
   includeFreeSpace: boolean;
   setIncludeFreeSpace: (include: boolean) => void;
+  disabled?: boolean;
 }
 
 export const CardSettings = ({
@@ -18,6 +19,7 @@ export const CardSettings = ({
   setShowTitle,
   includeFreeSpace,
   setIncludeFreeSpace,
+  disabled,
 }: CardSettingsProps) => {
   return (
     <div className="space-y-4">
@@ -28,6 +30,7 @@ export const CardSettings = ({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           className="mt-1"
+          disabled={disabled}
         />
       </div>
 
@@ -37,6 +40,7 @@ export const CardSettings = ({
           id="show-title"
           checked={showTitle}
           onCheckedChange={setShowTitle}
+          disabled={disabled}
         />
       </div>
 
@@ -46,6 +50,7 @@ export const CardSettings = ({
           id="free-space"
           checked={includeFreeSpace}
           onCheckedChange={setIncludeFreeSpace}
+          disabled={disabled}
         />
       </div>
     </div>

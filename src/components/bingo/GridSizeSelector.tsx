@@ -5,9 +5,10 @@ interface GridSizeSelectorProps {
   gridSize: string;
   setGridSize: (size: string) => void;
   cardType: string;
+  disabled?: boolean;
 }
 
-export const GridSizeSelector = ({ gridSize, setGridSize, cardType }: GridSizeSelectorProps) => {
+export const GridSizeSelector = ({ gridSize, setGridSize, cardType, disabled }: GridSizeSelectorProps) => {
   const sizes = cardType === "traditional" 
     ? ["30-ball", "75-ball", "80-ball", "90-ball"]
     : ["3x3", "4x4", "5x5"];
@@ -24,6 +25,7 @@ export const GridSizeSelector = ({ gridSize, setGridSize, cardType }: GridSizeSe
         value={gridSize}
         onValueChange={setGridSize}
         className="grid grid-cols-2 gap-4"
+        disabled={disabled}
       >
         {sizes.map((size) => (
           <div key={size}>
@@ -31,6 +33,7 @@ export const GridSizeSelector = ({ gridSize, setGridSize, cardType }: GridSizeSe
               value={size}
               id={size}
               className="peer sr-only"
+              disabled={disabled}
             />
             <Label
               htmlFor={size}
