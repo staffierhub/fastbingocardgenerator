@@ -1,11 +1,21 @@
-import { useQuery } from "@tanstack/react-query";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { BingoCard } from "@/components/bingo/BingoCard";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
-import { Loader2, Plus } from "lucide-react";
+import { Loader2, Plus, Pencil, Trash2 } from "lucide-react";
 import html2canvas from "html2canvas";
 import { Navigation } from "@/components/layout/Navigation";
+import { toast } from "sonner";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { useState } from "react";
+import { Input } from "@/components/ui/input";
 
 interface BingoCardData {
   id: string;
@@ -19,6 +29,10 @@ interface BingoCardData {
 }
 
 export default function MyCards() {
+  const queryClient = useQueryClient();
+  const [editingCard, setEditingCard] = useState<BingoCardData | null>(null);
+  const [editedTitle, setEditedTitle] = useState("");
+
   const { data: cards, isLoading } = useQuery({
     queryKey: ['bingo-cards'],
     queryFn: async () => {
@@ -32,6 +46,65 @@ export default function MyCards() {
     },
   });
 
+  const deleteMutation = useMutation({
+    mutationFn: async (cardId: string) => {
+      const { error } = await supabase
+        .from('bingo_cards')
+        .delete()
+        .eq('id', cardId);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bingo-cards'] });
+      toast.success("Card deleted successfully");
+    },
+    onError: (error) => {
+      toast.error("Failed to delete card");
+      console.error("Delete error:", error);
+    }
+  });
+
+  const updateMutation = useMutation({
+    mutationFn: async ({ id, title }: { id: string; title: string }) => {
+      const { error } = await supabase
+        .from('bingo_cards')
+        .update({ title })
+        .eq('id', id);
+      
+      if (error) throw error;
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['bingo-cards'] });
+      toast.success("Card updated successfully");
+      setEditingCard(null);
+    },
+    onError: (error) => {
+      toast.error("Failed to update card");
+      console.error("Update error:", error);
+    }
+  });
+
+  const handleDelete = (cardId: string) => {
+    if (window.confirm("Are you sure you want to delete this card?")) {
+      deleteMutation.mutate(cardId);
+    }
+  };
+
+  const handleEdit = (card: BingoCardData) => {
+    setEditingCard(card);
+    setEditedTitle(card.title);
+  };
+
+  const handleUpdate = () => {
+    if (editingCard && editedTitle.trim()) {
+      updateMutation.mutate({
+        id: editingCard.id,
+        title: editedTitle.trim()
+      });
+    }
+  };
+
   const handleDownload = async (card: BingoCardData) => {
     const cardElement = document.getElementById(`card-${card.id}`);
     if (!cardElement) return;
@@ -44,6 +117,7 @@ export default function MyCards() {
       link.click();
     } catch (error) {
       console.error('Error downloading card:', error);
+      toast.error("Failed to download card");
     }
   };
 
@@ -95,13 +169,54 @@ export default function MyCards() {
                     backgroundUrl={card.background_url}
                   />
                 </div>
-                <Button 
-                  variant="secondary" 
-                  className="w-full"
-                  onClick={() => handleDownload(card)}
-                >
-                  Download Card
-                </Button>
+                <div className="flex gap-2">
+                  <Dialog>
+                    <DialogTrigger asChild>
+                      <Button 
+                        variant="outline" 
+                        className="flex-1"
+                        onClick={() => handleEdit(card)}
+                      >
+                        <Pencil className="h-4 w-4 mr-2" />
+                        Edit
+                      </Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                      <DialogHeader>
+                        <DialogTitle>Edit Card Title</DialogTitle>
+                      </DialogHeader>
+                      <div className="space-y-4 py-4">
+                        <Input
+                          value={editedTitle}
+                          onChange={(e) => setEditedTitle(e.target.value)}
+                          placeholder="Enter new title"
+                        />
+                        <Button 
+                          className="w-full" 
+                          onClick={handleUpdate}
+                          disabled={!editedTitle.trim()}
+                        >
+                          Save Changes
+                        </Button>
+                      </div>
+                    </DialogContent>
+                  </Dialog>
+                  <Button 
+                    variant="outline" 
+                    className="flex-1"
+                    onClick={() => handleDelete(card.id)}
+                  >
+                    <Trash2 className="h-4 w-4 mr-2" />
+                    Delete
+                  </Button>
+                  <Button 
+                    variant="secondary" 
+                    className="flex-1"
+                    onClick={() => handleDownload(card)}
+                  >
+                    Download
+                  </Button>
+                </div>
               </div>
             ))}
           </div>
