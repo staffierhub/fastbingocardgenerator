@@ -15,6 +15,7 @@ interface BingoCardProps {
   gridSize: string;
   cardType: string;
   backgroundUrl?: string;
+  backgroundColor?: string;
 }
 
 export const BingoCard = ({ 
@@ -24,7 +25,8 @@ export const BingoCard = ({
   bingoContent,
   gridSize,
   cardType,
-  backgroundUrl 
+  backgroundUrl,
+  backgroundColor = "#F7C052"
 }: BingoCardProps) => {
   const getGridSize = () => {
     if (cardType === "traditional") {
@@ -55,10 +57,11 @@ export const BingoCard = ({
     backgroundImage: backgroundUrl ? `url(${backgroundUrl})` : 'none',
     backgroundSize: 'cover',
     backgroundPosition: 'center',
+    backgroundColor: backgroundColor,
   };
 
   return (
-    <Card className="p-8 bg-[#F7C052]" style={cardStyle}>
+    <Card className="p-8" style={cardStyle}>
       <div className="aspect-square">
         {showTitle && (
           <h2 className="text-3xl font-bold text-center mb-8">{title}</h2>

@@ -1,18 +1,11 @@
-import { Button } from "@/components/ui/button";
-import { Card } from "@/components/ui/card";
 import { supabase } from "@/integrations/supabase/client";
 import { useNavigate } from "react-router-dom";
 import { useToast } from "@/components/ui/use-toast";
 import { useState, useRef } from "react";
 import { BingoCard } from "@/components/bingo/BingoCard";
-import { CardTypeSelector } from "@/components/bingo/CardTypeSelector";
-import { GridSizeSelector } from "@/components/bingo/GridSizeSelector";
-import { CardSettings } from "@/components/bingo/CardSettings";
-import { AIGenerator } from "@/components/bingo/AIGenerator";
-import { BackgroundUploader } from "@/components/bingo/BackgroundUploader";
+import { CardControls } from "@/components/bingo/CardControls";
 import { Navigation } from "@/components/layout/Navigation";
 import html2canvas from 'html2canvas';
-import { Download } from "lucide-react";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -26,38 +19,8 @@ export default function Index() {
   const [isSaving, setIsSaving] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string>("");
+  const [backgroundColor, setBackgroundColor] = useState("#F7C052");
   const cardRef = useRef<HTMLDivElement>(null);
-
-  const handleLogout = async () => {
-    try {
-      await supabase.auth.signOut();
-      navigate("/login");
-      toast({
-        title: "Logged out successfully",
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error("Error logging out:", error);
-      toast({
-        title: "Error logging out",
-        variant: "destructive",
-        duration: 2000,
-      });
-    }
-  };
-
-  const handleRandomize = () => {
-    if (cardType === "traditional") {
-      setIncludeFreeSpace(prev => !prev);
-      setIncludeFreeSpace(prev => !prev);
-    } else {
-      setBingoContent(prev => [...shuffleArray(prev)]);
-    }
-    toast({
-      title: "Card randomized!",
-      duration: 2000,
-    });
-  };
 
   const handleSave = async () => {
     try {
@@ -111,7 +74,7 @@ export default function Index() {
     try {
       const canvas = await html2canvas(cardRef.current, {
         backgroundColor: null,
-        scale: 2, // Higher quality
+        scale: 2,
       });
       
       const link = document.createElement('a');
@@ -135,66 +98,32 @@ export default function Index() {
     }
   };
 
-  const shuffleArray = <T,>(array: T[]): T[] => {
-    return [...array].sort(() => Math.random() - 0.5);
-  };
-
   return (
     <div className="min-h-screen bg-[#EEF6FF]">
       <Navigation />
       
       <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-[350px,1fr] gap-8">
         <div className="space-y-6">
-          <Card className="p-6">
-            <CardTypeSelector 
-              cardType={cardType} 
-              setCardType={setCardType}
-              setGridSize={setGridSize}
-            />
-            <GridSizeSelector 
-              gridSize={gridSize} 
-              setGridSize={setGridSize} 
-              cardType={cardType}
-            />
-            <CardSettings
-              title={title}
-              setTitle={setTitle}
-              showTitle={showTitle}
-              setShowTitle={setShowTitle}
-              includeFreeSpace={includeFreeSpace}
-              setIncludeFreeSpace={setIncludeFreeSpace}
-            />
-            {cardType === "custom" && (
-              <AIGenerator setBingoContent={setBingoContent} />
-            )}
-            <BackgroundUploader onBackgroundChange={setBackgroundUrl} />
-            <div className="mt-4 space-y-2">
-              <Button
-                variant="secondary"
-                className="w-full"
-                onClick={handleRandomize}
-              >
-                Shuffle Card
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full"
-                onClick={handleSave}
-                disabled={isSaving}
-              >
-                {isSaving ? "Saving..." : "Save Card"}
-              </Button>
-              <Button
-                variant="outline"
-                className="w-full"
-                onClick={handleDownload}
-                disabled={isDownloading}
-              >
-                <Download className="mr-2 h-4 w-4" />
-                {isDownloading ? "Downloading..." : "Download Card"}
-              </Button>
-            </div>
-          </Card>
+          <CardControls
+            cardType={cardType}
+            setCardType={setCardType}
+            gridSize={gridSize}
+            setGridSize={setGridSize}
+            title={title}
+            setTitle={setTitle}
+            showTitle={showTitle}
+            setShowTitle={setShowTitle}
+            includeFreeSpace={includeFreeSpace}
+            setIncludeFreeSpace={setIncludeFreeSpace}
+            setBingoContent={setBingoContent}
+            onBackgroundChange={setBackgroundUrl}
+            backgroundColor={backgroundColor}
+            setBackgroundColor={setBackgroundColor}
+            onSave={handleSave}
+            onDownload={handleDownload}
+            isSaving={isSaving}
+            isDownloading={isDownloading}
+          />
         </div>
 
         <div ref={cardRef}>
@@ -206,6 +135,7 @@ export default function Index() {
             gridSize={gridSize}
             cardType={cardType}
             backgroundUrl={backgroundUrl}
+            backgroundColor={backgroundColor}
           />
         </div>
       </main>
