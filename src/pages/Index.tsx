@@ -10,6 +10,7 @@ import { GridSizeSelector } from "@/components/bingo/GridSizeSelector";
 import { CardSettings } from "@/components/bingo/CardSettings";
 import { AIGenerator } from "@/components/bingo/AIGenerator";
 import { FileText } from "lucide-react";
+import { Navigation } from "@/components/layout/Navigation";
 
 export default function Index() {
   const navigate = useNavigate();
@@ -22,7 +23,6 @@ export default function Index() {
   const [bingoContent, setBingoContent] = useState<string[]>([]);
   const [isSaving, setIsSaving] = useState(false);
 
-  // Update grid size when card type changes
   useEffect(() => {
     if (cardType === "custom") {
       setGridSize("3x3");
@@ -112,23 +112,10 @@ export default function Index() {
   };
 
   return (
-    <div className="min-h-screen p-4 bg-[#EEF6FF]">
-      <header className="flex justify-between items-center mb-8">
-        <h1 className="text-3xl font-bold text-[#5BB6EE]">Bingo Bliss</h1>
-        <div className="flex gap-4">
-          <Link to="/my-cards">
-            <Button variant="outline" className="flex items-center gap-2">
-              <FileText className="h-4 w-4" />
-              My Cards
-            </Button>
-          </Link>
-          <Button onClick={handleLogout} variant="outline">
-            Logout
-          </Button>
-        </div>
-      </header>
-
-      <main className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-[350px,1fr] gap-8">
+    <div className="min-h-screen bg-[#EEF6FF]">
+      <Navigation />
+      
+      <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-[350px,1fr] gap-8">
         <div className="space-y-6">
           <Card className="p-6">
             <CardTypeSelector cardType={cardType} setCardType={setCardType} />
@@ -163,18 +150,6 @@ export default function Index() {
                 disabled={isSaving}
               >
                 {isSaving ? "Saving..." : "Save Card"}
-              </Button>
-              <Button
-                variant="secondary"
-                className="w-full"
-                onClick={() => {
-                  toast({
-                    title: "Coming soon!",
-                    duration: 2000,
-                  });
-                }}
-              >
-                Play Online Now
               </Button>
             </div>
           </Card>
