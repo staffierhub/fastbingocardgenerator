@@ -17,20 +17,22 @@ export const BackgroundUploader = ({ onBackgroundChange }: BackgroundUploaderPro
     if (!file) return;
 
     // Validate file type
-    if (!file.type.startsWith('image/')) {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/heic'];
+    if (!allowedTypes.includes(file.type.toLowerCase())) {
       toast({
         title: "Invalid file type",
-        description: "Please upload an image file",
+        description: "Please upload a JPEG, PNG, or HEIC file",
         variant: "destructive",
       });
       return;
     }
 
-    // Validate file size (max 5MB)
-    if (file.size > 5 * 1024 * 1024) {
+    // Validate file size (max 2MB)
+    const MAX_SIZE = 2 * 1024 * 1024; // 2MB in bytes
+    if (file.size > MAX_SIZE) {
       toast({
         title: "File too large",
-        description: "Please upload an image smaller than 5MB",
+        description: "Please upload an image smaller than 2MB",
         variant: "destructive",
       });
       return;
@@ -83,7 +85,7 @@ export const BackgroundUploader = ({ onBackgroundChange }: BackgroundUploaderPro
           {isUploading ? "Uploading..." : "Upload Background"}
           <input
             type="file"
-            accept="image/*"
+            accept="image/jpeg,image/png,image/heic"
             className="hidden"
             onChange={handleUpload}
             disabled={isUploading}
