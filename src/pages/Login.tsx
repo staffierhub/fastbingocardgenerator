@@ -41,7 +41,7 @@ const Login = () => {
     const target = e.target as HTMLElement;
     if (target.textContent?.toLowerCase().includes('sign up')) {
       e.preventDefault();
-      window.location.href = 'https://buy.stripe.com/test_8wM5kR8E2guy5m8eUU';
+      window.location.href = 'https://buy.stripe.com/6oE4gvakvcZL8rC6oo';
     }
   };
 

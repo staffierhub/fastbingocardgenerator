@@ -7,8 +7,8 @@ export const SubscribeButton = () => {
   const handleSubscribe = async () => {
     try {
       setIsLoading(true);
-      // Redirect to Stripe test payment link
-      window.location.href = 'https://buy.stripe.com/test_8wM5kR8E2guy5m8eUU';
+      // Redirect to Stripe live payment link
+      window.location.href = 'https://buy.stripe.com/6oE4gvakvcZL8rC6oo';
     } catch (error) {
       console.error('Error:', error);
     } finally {
