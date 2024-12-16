@@ -1,6 +1,5 @@
 import { Card } from "@/components/ui/card";
 import { generateBingoGrid } from "@/utils/bingoGridGenerator";
-import { useState } from "react";
 
 interface BingoCell {
   value: string | number;
@@ -42,51 +41,13 @@ export const BingoCard = ({
   const size = getGridSize();
   const totalCells = size * size;
 
-  const generateCustomGrid = () => {
-    const cells: BingoCell[] = [];
-    for (let i = 0; i < totalCells; i++) {
-      cells.push({
-        value: bingoContent[i] || "",
-        isFreeSpace: includeFreeSpace && i === Math.floor(totalCells / 2),
-        isBlank: false
-      });
-    }
-    return cells;
-  };
-
-  const initialGrid = cardType === "traditional" 
+  const grid = cardType === "traditional" 
     ? generateBingoGrid(gridSize as any, includeFreeSpace)
-    : generateCustomGrid();
-
-  const [grid, setGrid] = useState(initialGrid);
-
-  const handleCellEdit = (index: number, newValue: string) => {
-    const newGrid = [...grid];
-    newGrid[index] = {
-      ...newGrid[index],
-      value: newValue
-    };
-    setGrid(newGrid);
-  };
-
-  const toggleFreeSpace = (index: number) => {
-    const newGrid = [...grid];
-    // Remove existing free space if there is one
-    const currentFreeSpaceIndex = newGrid.findIndex(cell => cell.isFreeSpace);
-    if (currentFreeSpaceIndex !== -1) {
-      newGrid[currentFreeSpaceIndex] = {
-        ...newGrid[currentFreeSpaceIndex],
-        isFreeSpace: false
-      };
-    }
-    // Toggle the clicked cell
-    newGrid[index] = {
-      ...newGrid[index],
-      isFreeSpace: !newGrid[index].isFreeSpace,
-      value: newGrid[index].isFreeSpace ? newGrid[index].value : "FREE"
-    };
-    setGrid(newGrid);
-  };
+    : Array(totalCells).fill(null).map((_, index) => ({
+        value: bingoContent[index] || "",
+        isFreeSpace: includeFreeSpace && index === Math.floor(totalCells / 2),
+        isBlank: false
+      } as BingoCell));
 
   return (
     <Card className="p-8 bg-[#F7C052]">
@@ -101,25 +62,17 @@ export const BingoCard = ({
             gridTemplateRows: `repeat(${size}, 1fr)`
           }}
         >
-          {grid.map((cell, index) => (
+          {grid.flat().map((cell, index) => (
             <div
               key={index}
               className={`
                 bg-white rounded-lg flex items-center justify-center p-2 
-                text-center text-sm border-2 border-gray-200 relative
+                text-center text-sm border-2 border-gray-200
                 ${cell.isBlank ? 'bg-gray-100' : ''}
                 ${cell.isFreeSpace ? 'bg-yellow-100' : ''}
-                cursor-pointer
               `}
-              onClick={() => includeFreeSpace && toggleFreeSpace(index)}
             >
-              <input
-                type="text"
-                value={cell.value}
-                onChange={(e) => handleCellEdit(index, e.target.value)}
-                className="w-full h-full text-center bg-transparent focus:outline-none cursor-text"
-                onClick={(e) => e.stopPropagation()}
-              />
+              {cell.value}
             </div>
           ))}
         </div>
