@@ -3,7 +3,7 @@ import { CardActions } from "@/components/bingo/CardActions";
 import html2canvas from "html2canvas";
 import { toast } from "sonner";
 
-interface BingoCardData {
+export interface BingoCardData {
   id: string;
   title: string;
   grid_size: string;
@@ -11,7 +11,7 @@ interface BingoCardData {
   content: string[];
   show_title: boolean;
   include_free_space: boolean;
-  background_url: string;
+  background_url: string | null;
 }
 
 interface CardGridProps {
@@ -50,7 +50,7 @@ export const CardGrid = ({ cards, isAdmin, onDelete, onUpdate }: CardGridProps) 
               bingoContent={card.content}
               gridSize={card.grid_size}
               cardType={card.card_type}
-              backgroundUrl={card.background_url}
+              backgroundUrl={card.background_url || undefined}
             />
           </div>
           <CardActions

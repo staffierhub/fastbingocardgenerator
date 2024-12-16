@@ -29,7 +29,12 @@ export default function MyCards() {
         .order('created_at', { ascending: false });
       
       if (error) throw error;
-      return data;
+      
+      // Transform the data to ensure content is always a string array
+      return data.map(card => ({
+        ...card,
+        content: Array.isArray(card.content) ? card.content : []
+      }));
     },
   });
 
@@ -118,7 +123,7 @@ export default function MyCards() {
           </div>
         ) : (
           <CardGrid
-            cards={cards}
+            cards={cards || []}
             isAdmin={isAdmin}
             onDelete={handleDelete}
             onUpdate={handleUpdate}
