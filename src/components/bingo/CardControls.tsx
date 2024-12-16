@@ -5,7 +5,7 @@ import { GridSizeSelector } from "./GridSizeSelector";
 import { CardSettings } from "./CardSettings";
 import { AIGenerator } from "./AIGenerator";
 import { BackgroundUploader } from "./BackgroundUploader";
-import { BackgroundColorPicker } from "./BackgroundColorPicker";
+import { ColorSlider } from "./ColorSlider";
 import { Download } from "lucide-react";
 
 interface CardControlsProps {
@@ -73,7 +73,7 @@ export const CardControls = ({
         <AIGenerator setBingoContent={setBingoContent} />
       )}
       <BackgroundUploader onBackgroundChange={onBackgroundChange} />
-      <BackgroundColorPicker
+      <ColorSlider
         backgroundColor={backgroundColor}
         onBackgroundColorChange={setBackgroundColor}
       />
