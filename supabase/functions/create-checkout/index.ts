@@ -21,21 +21,18 @@ serve(async (req) => {
   try {
     console.log('Starting checkout process...')
     
-    // Get the session or user object
+    // Get the authorization header
     const authHeader = req.headers.get('Authorization')
     if (!authHeader) {
       throw new Error('No authorization header')
     }
-    
-    const token = authHeader.replace('Bearer ', '')
-    console.log('Got auth token, fetching user...')
-    
-    const { data, error: userError } = await supabaseClient.auth.getUser(token)
-    if (userError) throw userError
-    
-    const user = data.user
-    const email = user?.email
 
+    // Get the current session
+    const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
+    if (sessionError) throw sessionError
+    if (!session) throw new Error('No active session')
+
+    const email = session.user.email
     if (!email) {
       throw new Error('No email found')
     }
