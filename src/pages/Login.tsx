@@ -33,7 +33,7 @@ const Login = () => {
               }
             }
           }}
-          providers={[]}
+          providers={["facebook"]}
         />
       </div>
     </div>
