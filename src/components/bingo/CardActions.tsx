@@ -1,125 +1,119 @@
 import { Button } from "@/components/ui/button";
-import { Pencil, Trash2, Grid } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from "@/components/ui/dialog";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { supabase } from "@/integrations/supabase/client";
+import { Download, Pencil, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-import { supabase } from "@/integrations/supabase/client";
 
 interface CardActionsProps {
-  card: {
-    id: string;
-    title: string;
-  };
-  isAdmin: boolean;
-  onDelete: (cardId: string) => void;
-  onUpdate: (id: string, title: string) => void;
-  onDownload: () => void;
+  cardId: string;
+  title: string;
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string, title: string) => void;
 }
 
-export const CardActions = ({ card, isAdmin, onDelete, onUpdate, onDownload }: CardActionsProps) => {
-  const [editedTitle, setEditedTitle] = useState(card.title);
-  const [isTemplateDialogOpen, setIsTemplateDialogOpen] = useState(false);
-  const [metaTags, setMetaTags] = useState("");
+export const CardActions = ({ cardId, title: initialTitle, isAdmin, onDelete, onUpdate }: CardActionsProps) => {
+  const [isEditOpen, setIsEditOpen] = useState(false);
+  const [isTemplateOpen, setIsTemplateOpen] = useState(false);
+  const [title, setTitle] = useState(initialTitle);
+  const [tags, setTags] = useState("");
+  const [isSaving, setIsSaving] = useState(false);
 
-  const handleSaveAsTemplate = async () => {
+  const handleSaveTemplate = async () => {
     try {
+      setIsSaving(true);
       const { data, error } = await supabase.rpc('convert_card_to_template', {
-        card_id: card.id,
-        tags: metaTags.split(',').map(tag => tag.trim()).filter(tag => tag)
+        card_id: cardId,
+        tags: tags.split(',').map(tag => tag.trim()).filter(tag => tag)
       });
 
       if (error) throw error;
 
-      toast.success("Card saved as template successfully");
-      setIsTemplateDialogOpen(false);
-    } catch (error: any) {
-      toast.error(error.message || "Failed to save as template");
+      toast.success("Card saved as template successfully!");
+      setIsTemplateOpen(false);
+    } catch (error) {
+      console.error('Error saving template:', error);
+      toast.error("Failed to save template");
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleUpdate = () => {
+    if (onUpdate) {
+      onUpdate(cardId, title);
+      setIsEditOpen(false);
     }
   };
 
   return (
-    <div className="flex gap-2">
-      <Dialog>
-        <DialogTrigger asChild>
-          <Button variant="outline" className="flex-1">
-            <Pencil className="h-4 w-4 mr-2" />
-            Edit
-          </Button>
-        </DialogTrigger>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>Edit Card Title</DialogTitle>
-          </DialogHeader>
-          <div className="space-y-4 py-4">
-            <Input
-              value={editedTitle}
-              onChange={(e) => setEditedTitle(e.target.value)}
-              placeholder="Enter new title"
-            />
-            <Button 
-              className="w-full" 
-              onClick={() => onUpdate(card.id, editedTitle)}
-              disabled={!editedTitle.trim()}
-            >
-              Save Changes
+    <div className="flex gap-2 mt-2">
+      <Button variant="outline" size="sm" onClick={() => window.print()}>
+        <Download className="h-4 w-4" />
+      </Button>
+      
+      {onUpdate && (
+        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" size="sm">
+              <Pencil className="h-4 w-4" />
             </Button>
-          </div>
-        </DialogContent>
-      </Dialog>
+          </DialogTrigger>
+          <DialogContent>
+            <DialogHeader>
+              <DialogTitle>Edit Card Title</DialogTitle>
+            </DialogHeader>
+            <div className="space-y-4">
+              <div>
+                <Label htmlFor="title">Title</Label>
+                <Input
+                  id="title"
+                  value={title}
+                  onChange={(e) => setTitle(e.target.value)}
+                />
+              </div>
+              <Button onClick={handleUpdate}>Save Changes</Button>
+            </div>
+          </DialogContent>
+        </Dialog>
+      )}
 
-      <Button 
-        variant="outline" 
-        className="flex-1"
-        onClick={() => onDelete(card.id)}
-      >
-        <Trash2 className="h-4 w-4 mr-2" />
-        Delete
-      </Button>
-
-      <Button 
-        variant="secondary" 
-        className="flex-1"
-        onClick={onDownload}
-      >
-        Download
-      </Button>
+      {onDelete && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => onDelete(cardId)}
+        >
+          <Trash2 className="h-4 w-4" />
+        </Button>
+      )}
 
       {isAdmin && (
-        <Dialog open={isTemplateDialogOpen} onOpenChange={setIsTemplateDialogOpen}>
+        <Dialog open={isTemplateOpen} onOpenChange={setIsTemplateOpen}>
           <DialogTrigger asChild>
-            <Button variant="outline" className="flex-1">
-              <Grid className="h-4 w-4 mr-2" />
-              Template
+            <Button variant="outline" size="sm">
+              Save as Template
             </Button>
           </DialogTrigger>
           <DialogContent>
             <DialogHeader>
               <DialogTitle>Save as Template</DialogTitle>
             </DialogHeader>
-            <div className="space-y-4 py-4">
+            <div className="space-y-4">
               <div>
-                <label className="text-sm font-medium">Meta Tags</label>
+                <Label htmlFor="tags">Meta Tags (comma-separated)</Label>
                 <Input
-                  value={metaTags}
-                  onChange={(e) => setMetaTags(e.target.value)}
-                  placeholder="Enter tags separated by commas"
+                  id="tags"
+                  value={tags}
+                  onChange={(e) => setTags(e.target.value)}
+                  placeholder="fun, easy, kids"
                 />
-                <p className="text-sm text-gray-500 mt-1">
-                  Example: holiday, christmas, family
-                </p>
               </div>
-              <Button 
-                className="w-full" 
-                onClick={handleSaveAsTemplate}
-              >
-                Save as Template
+              <Button onClick={handleSaveTemplate} disabled={isSaving}>
+                {isSaving ? "Saving..." : "Save Template"}
               </Button>
             </div>
           </DialogContent>

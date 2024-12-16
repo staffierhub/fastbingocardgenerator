@@ -1,7 +1,5 @@
-import { BingoCard } from "@/components/bingo/BingoCard";
-import { CardActions } from "@/components/bingo/CardActions";
-import html2canvas from "html2canvas";
-import { toast } from "sonner";
+import { BingoCard } from "./BingoCard";
+import { CardActions } from "./CardActions";
 
 export interface BingoCardData {
   id: string;
@@ -16,33 +14,17 @@ export interface BingoCardData {
 
 interface CardGridProps {
   cards: BingoCardData[];
-  isAdmin: boolean;
-  onDelete: (cardId: string) => void;
-  onUpdate: (id: string, title: string) => void;
+  isAdmin?: boolean;
+  onDelete?: (id: string) => void;
+  onUpdate?: (id: string, title: string) => void;
 }
 
 export const CardGrid = ({ cards, isAdmin, onDelete, onUpdate }: CardGridProps) => {
-  const handleDownload = async (card: BingoCardData) => {
-    const cardElement = document.getElementById(`card-${card.id}`);
-    if (!cardElement) return;
-
-    try {
-      const canvas = await html2canvas(cardElement);
-      const link = document.createElement('a');
-      link.download = `${card.title.toLowerCase().replace(/\s+/g, '-')}.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-    } catch (error) {
-      console.error('Error downloading card:', error);
-      toast.error("Failed to download card");
-    }
-  };
-
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
       {cards.map((card) => (
         <div key={card.id} className="space-y-4">
-          <div id={`card-${card.id}`}>
+          <div className="relative">
             <BingoCard
               title={card.title}
               showTitle={card.show_title}
@@ -54,11 +36,11 @@ export const CardGrid = ({ cards, isAdmin, onDelete, onUpdate }: CardGridProps) 
             />
           </div>
           <CardActions
-            card={card}
+            cardId={card.id}
+            title={card.title}
             isAdmin={isAdmin}
             onDelete={onDelete}
             onUpdate={onUpdate}
-            onDownload={() => handleDownload(card)}
           />
         </div>
       ))}

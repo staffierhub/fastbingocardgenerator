@@ -33,7 +33,10 @@ export default function MyCards() {
       // Transform the data to ensure content is always a string array
       return data.map(card => ({
         ...card,
-        content: Array.isArray(card.content) ? card.content : []
+        content: Array.isArray(card.content) ? card.content : [],
+        background_url: card.background_url || null,
+        show_title: card.show_title ?? true,
+        include_free_space: card.include_free_space ?? true
       }));
     },
   });
