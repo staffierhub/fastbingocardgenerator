@@ -12,7 +12,7 @@ const Login = () => {
     // Check if user is already logged in
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
-        navigate("/");
+        navigate("/generator");
       }
     });
 
@@ -22,14 +22,11 @@ const Login = () => {
     } = supabase.auth.onAuthStateChange((event, session) => {
       if (event === 'SIGNED_IN') {
         toast.success('Successfully signed in!');
-        navigate("/");
+        navigate("/generator");
       } else if (event === 'SIGNED_OUT') {
         toast.success('Successfully signed out!');
       } else if (event === 'USER_UPDATED') {
         toast.success('Profile updated successfully!');
-      } else if (event === 'USER_DELETED') {
-        toast.success('Account deleted successfully!');
-        navigate("/login");
       } else if (event === 'PASSWORD_RECOVERY') {
         toast.info('Check your email for password reset instructions.');
       }

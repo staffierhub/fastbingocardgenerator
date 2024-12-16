@@ -21,7 +21,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session } = useContext(AuthContext);
   
   if (!session) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/login" replace />;
   }
 
   return <>{children}</>;
@@ -54,16 +54,7 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
-              <Route 
-                path="/" 
-                element={
-                  session ? (
-                    <Navigate to="/generator" replace />
-                  ) : (
-                    <Landing />
-                  )
-                } 
-              />
+              <Route path="/" element={<Landing />} />
               <Route path="/login" element={<Login />} />
               <Route
                 path="/generator"
