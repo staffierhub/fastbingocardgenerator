@@ -35,7 +35,6 @@ export const BingoCard = ({
         default: return 5;
       }
     } else {
-      // For custom cards, parse the size from the format "3x3", "4x4", etc.
       return parseInt(gridSize.split('x')[0]);
     }
   };
@@ -43,27 +42,35 @@ export const BingoCard = ({
   const size = getGridSize();
   const totalCells = size * size;
 
+  const generateCustomGrid = () => {
+    const cells: BingoCell[] = [];
+    for (let i = 0; i < totalCells; i++) {
+      cells.push({
+        value: bingoContent[i] || "",
+        isFreeSpace: includeFreeSpace && i === Math.floor(totalCells / 2),
+        isBlank: false
+      });
+    }
+    return cells;
+  };
+
   const initialGrid = cardType === "traditional" 
     ? generateBingoGrid(gridSize as any, includeFreeSpace)
-    : Array(totalCells).fill(null).map((_, index) => ({
-        value: bingoContent[index] || "",
-        isFreeSpace: includeFreeSpace && index === Math.floor(totalCells / 2),
-        isBlank: false
-      } as BingoCell));
+    : generateCustomGrid();
 
   const [grid, setGrid] = useState(initialGrid);
 
   const handleCellEdit = (index: number, newValue: string) => {
-    const newGrid = [...grid.flat()];
+    const newGrid = [...grid];
     newGrid[index] = {
       ...newGrid[index],
       value: newValue
     };
-    setGrid(newGrid.map(cell => [cell]));
+    setGrid(newGrid);
   };
 
   const toggleFreeSpace = (index: number) => {
-    const newGrid = [...grid.flat()];
+    const newGrid = [...grid];
     // Remove existing free space if there is one
     const currentFreeSpaceIndex = newGrid.findIndex(cell => cell.isFreeSpace);
     if (currentFreeSpaceIndex !== -1) {
@@ -78,7 +85,7 @@ export const BingoCard = ({
       isFreeSpace: !newGrid[index].isFreeSpace,
       value: newGrid[index].isFreeSpace ? newGrid[index].value : "FREE"
     };
-    setGrid(newGrid.map(cell => [cell]));
+    setGrid(newGrid);
   };
 
   return (
@@ -94,7 +101,7 @@ export const BingoCard = ({
             gridTemplateRows: `repeat(${size}, 1fr)`
           }}
         >
-          {grid.flat().map((cell, index) => (
+          {grid.map((cell, index) => (
             <div
               key={index}
               className={`
