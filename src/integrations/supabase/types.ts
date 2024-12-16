@@ -60,6 +60,7 @@ export type Database = {
           grid_size: string
           id: string
           include_free_space: boolean | null
+          meta_tags: string[] | null
           show_title: boolean | null
           title: string
           updated_at: string
@@ -72,6 +73,7 @@ export type Database = {
           grid_size: string
           id?: string
           include_free_space?: boolean | null
+          meta_tags?: string[] | null
           show_title?: boolean | null
           title: string
           updated_at?: string
@@ -84,6 +86,7 @@ export type Database = {
           grid_size?: string
           id?: string
           include_free_space?: boolean | null
+          meta_tags?: string[] | null
           show_title?: boolean | null
           title?: string
           updated_at?: string
@@ -119,7 +122,13 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      convert_card_to_template: {
+        Args: {
+          card_id: string
+          tags?: string[]
+        }
+        Returns: string
+      }
     }
     Enums: {
       [_ in never]: never
