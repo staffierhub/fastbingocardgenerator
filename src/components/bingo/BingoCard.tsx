@@ -1,6 +1,12 @@
 import { Card } from "@/components/ui/card";
 import { generateBingoGrid } from "@/utils/bingoGridGenerator";
 
+interface BingoCell {
+  value: string | number;
+  isBlank?: boolean;
+  isFreeSpace?: boolean;
+}
+
 interface BingoCardProps {
   title: string;
   showTitle: boolean;
@@ -37,8 +43,9 @@ export const BingoCard = ({
     ? generateBingoGrid(gridSize as any, includeFreeSpace)
     : Array(25).fill(null).map((_, index) => ({
         value: bingoContent[index] || "",
-        isFreeSpace: includeFreeSpace && index === 12
-      }));
+        isFreeSpace: includeFreeSpace && index === 12,
+        isBlank: false
+      } as BingoCell));
 
   return (
     <Card className="p-8 bg-[#F7C052]">

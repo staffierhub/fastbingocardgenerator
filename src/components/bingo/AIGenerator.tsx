@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { useState } from "react";
+import { supabase } from "@/integrations/supabase/client";
 
 interface AIGeneratorProps {
   setBingoContent: (content: string[]) => void;
@@ -24,21 +25,11 @@ export const AIGenerator = ({ setBingoContent }: AIGeneratorProps) => {
 
     setIsGenerating(true);
     try {
-      const response = await fetch(
-        "https://wlhopipxemzceplljzsy.supabase.co/functions/v1/generate-bingo-content",
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ theme }),
-        }
-      );
+      const { data, error } = await supabase.functions.invoke('generate-bingo-content', {
+        body: { theme }
+      });
 
-      const data = await response.json();
-      if (data.error) {
-        throw new Error(data.error);
-      }
+      if (error) throw error;
 
       setBingoContent(data.content);
       toast({
