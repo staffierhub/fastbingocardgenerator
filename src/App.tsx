@@ -10,6 +10,7 @@ import Index from "./pages/Index";
 import Login from "./pages/Login";
 import MyCards from "./pages/MyCards";
 import Landing from "./pages/Landing";
+import Templates from "./pages/Templates";
 
 const queryClient = new QueryClient();
 
@@ -69,6 +70,14 @@ const App = () => {
                 element={
                   <ProtectedRoute>
                     <MyCards />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/templates"
+                element={
+                  <ProtectedRoute>
+                    <Templates />
                   </ProtectedRoute>
                 }
               />

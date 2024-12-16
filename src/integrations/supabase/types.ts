@@ -51,6 +51,45 @@ export type Database = {
         }
         Relationships: []
       }
+      bingo_templates: {
+        Row: {
+          background_url: string | null
+          card_type: string
+          content: Json
+          created_at: string
+          grid_size: string
+          id: string
+          include_free_space: boolean | null
+          show_title: boolean | null
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          background_url?: string | null
+          card_type: string
+          content: Json
+          created_at?: string
+          grid_size: string
+          id?: string
+          include_free_space?: boolean | null
+          show_title?: boolean | null
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          background_url?: string | null
+          card_type?: string
+          content?: Json
+          created_at?: string
+          grid_size?: string
+          id?: string
+          include_free_space?: boolean | null
+          show_title?: boolean | null
+          title?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null

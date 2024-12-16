@@ -1,5 +1,5 @@
 import { NavigationMenu, NavigationMenuItem, NavigationMenuList, navigationMenuTriggerStyle } from "@/components/ui/navigation-menu";
-import { Home, User, LogOut } from "lucide-react";
+import { Home, User, LogOut, Template } from "lucide-react";
 import { Link } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/components/ui/use-toast";
@@ -53,6 +53,16 @@ export function Navigation() {
               >
                 <User className="h-4 w-4" />
                 My Cards
+              </Link>
+            </NavigationMenuItem>
+
+            <NavigationMenuItem>
+              <Link 
+                to="/templates" 
+                className={navigationMenuTriggerStyle() + " gap-2"}
+              >
+                <Template className="h-4 w-4" />
+                Templates
               </Link>
             </NavigationMenuItem>
             
