@@ -9,6 +9,7 @@ import { supabase } from "@/integrations/supabase/client";
 import Index from "./pages/Index";
 import Login from "./pages/Login";
 import MyCards from "./pages/MyCards";
+import Landing from "./pages/Landing";
 
 const queryClient = new QueryClient();
 
@@ -20,7 +21,7 @@ const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
   const { session } = useContext(AuthContext);
   
   if (!session) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   return <>{children}</>;
@@ -53,9 +54,19 @@ const App = () => {
           <Sonner />
           <BrowserRouter>
             <Routes>
+              <Route 
+                path="/" 
+                element={
+                  session ? (
+                    <Navigate to="/generator" replace />
+                  ) : (
+                    <Landing />
+                  )
+                } 
+              />
               <Route path="/login" element={<Login />} />
               <Route
-                path="/"
+                path="/generator"
                 element={
                   <ProtectedRoute>
                     <Index />
