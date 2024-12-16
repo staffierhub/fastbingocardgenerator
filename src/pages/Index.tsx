@@ -15,8 +15,8 @@ import { Navigation } from "@/components/layout/Navigation";
 export default function Index() {
   const navigate = useNavigate();
   const { toast } = useToast();
-  const [cardType, setCardType] = useState("traditional");
-  const [gridSize, setGridSize] = useState("75-ball");
+  const [cardType, setCardType] = useState("custom");
+  const [gridSize, setGridSize] = useState("3x3");
   const [title, setTitle] = useState("Bingo Card");
   const [showTitle, setShowTitle] = useState(true);
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
