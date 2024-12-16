@@ -1,10 +1,9 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useToast } from "@/components/ui/use-toast";
 import { BingoCard } from "./BingoCard";
 import { supabase } from "@/integrations/supabase/client";
 import { CardControls } from "./CardControls";
 import html2canvas from 'html2canvas';
-import { useRef } from "react";
 
 export const FreeBingoGenerator = () => {
   const { toast } = useToast();
@@ -14,43 +13,17 @@ export const FreeBingoGenerator = () => {
   const [showTitle, setShowTitle] = useState(true);
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
   const [bingoContent, setBingoContent] = useState<string[]>(Array(9).fill("")); // Default 3x3 grid content
-  const [showCard, setShowCard] = useState(true); // Changed to true to show default card
+  const [showCard, setShowCard] = useState(true);
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string>("");
   const [backgroundColor, setBackgroundColor] = useState("#F7C052");
+  const [hasReachedDailyLimit, setHasReachedDailyLimit] = useState(false);
   const cardRef = useRef<HTMLDivElement>(null);
 
-  const handleDownload = async () => {
-    if (!cardRef.current) return;
-    
-    setIsDownloading(true);
-    try {
-      const canvas = await html2canvas(cardRef.current, {
-        backgroundColor: null,
-        scale: 2,
-      });
-      
-      const link = document.createElement('a');
-      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-bingo-card.png`;
-      link.href = canvas.toDataURL('image/png');
-      link.click();
-      
-      toast({
-        title: "Card downloaded successfully!",
-        duration: 2000,
-      });
-    } catch (error) {
-      console.error('Error downloading card:', error);
-      toast({
-        title: "Error downloading card",
-        variant: "destructive",
-        duration: 2000,
-      });
-    } finally {
-      setIsDownloading(false);
-    }
-  };
+  useEffect(() => {
+    checkDailyLimit();
+  }, []);
 
   const checkDailyLimit = async () => {
     try {
@@ -64,6 +37,7 @@ export const FreeBingoGenerator = () => {
       if (usageError) throw usageError;
 
       if (usageData && usageData.length >= 1) {
+        setHasReachedDailyLimit(true);
         toast({
           title: "Daily limit reached",
           description: "You can generate 1 bingo card per day. Sign up for unlimited cards!",
@@ -87,8 +61,42 @@ export const FreeBingoGenerator = () => {
         .insert([{ ip_address: ip }]);
 
       if (insertError) throw insertError;
+      setHasReachedDailyLimit(true);
     } catch (error) {
       console.error("Error recording usage:", error);
+    }
+  };
+
+  const handleDownload = async () => {
+    if (!cardRef.current || hasReachedDailyLimit) return;
+    
+    setIsDownloading(true);
+    try {
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
+      });
+      
+      const link = document.createElement('a');
+      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-bingo-card.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
+      await recordUsage();
+      
+      toast({
+        title: "Card downloaded successfully!",
+        duration: 2000,
+      });
+    } catch (error) {
+      console.error('Error downloading card:', error);
+      toast({
+        title: "Error downloading card",
+        variant: "destructive",
+        duration: 2000,
+      });
+    } finally {
+      setIsDownloading(false);
     }
   };
 
@@ -107,16 +115,43 @@ export const FreeBingoGenerator = () => {
           includeFreeSpace={includeFreeSpace}
           setIncludeFreeSpace={setIncludeFreeSpace}
           setBingoContent={async (content) => {
-            const canProceed = await checkDailyLimit();
-            if (!canProceed) return;
-            
+            if (hasReachedDailyLimit) {
+              toast({
+                title: "Daily limit reached",
+                description: "You can generate 1 bingo card per day. Sign up for unlimited cards!",
+                variant: "destructive",
+                duration: 3000,
+              });
+              return;
+            }
             setBingoContent(content);
             setShowCard(true);
-            await recordUsage();
           }}
-          onBackgroundChange={setBackgroundUrl}
+          onBackgroundChange={(url) => {
+            if (hasReachedDailyLimit) {
+              toast({
+                title: "Daily limit reached",
+                description: "You can generate 1 bingo card per day. Sign up for unlimited cards!",
+                variant: "destructive",
+                duration: 3000,
+              });
+              return;
+            }
+            setBackgroundUrl(url);
+          }}
           backgroundColor={backgroundColor}
-          setBackgroundColor={setBackgroundColor}
+          setBackgroundColor={(color) => {
+            if (hasReachedDailyLimit) {
+              toast({
+                title: "Daily limit reached",
+                description: "You can generate 1 bingo card per day. Sign up for unlimited cards!",
+                variant: "destructive",
+                duration: 3000,
+              });
+              return;
+            }
+            setBackgroundColor(color);
+          }}
           onSave={() => {
             toast({
               title: "Sign up to save cards!",
@@ -127,6 +162,7 @@ export const FreeBingoGenerator = () => {
           onDownload={handleDownload}
           isSaving={false}
           isDownloading={isDownloading}
+          isDisabled={hasReachedDailyLimit}
         />
       </div>
 

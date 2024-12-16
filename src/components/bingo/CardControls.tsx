@@ -27,6 +27,7 @@ interface CardControlsProps {
   onDownload: () => void;
   isSaving: boolean;
   isDownloading: boolean;
+  isDisabled?: boolean;
 }
 
 export const CardControls = ({
@@ -48,6 +49,7 @@ export const CardControls = ({
   onDownload,
   isSaving,
   isDownloading,
+  isDisabled = false,
 }: CardControlsProps) => {
   return (
     <Card className="p-6">
@@ -55,11 +57,13 @@ export const CardControls = ({
         cardType={cardType} 
         setCardType={setCardType}
         setGridSize={setGridSize}
+        disabled={isDisabled}
       />
       <GridSizeSelector 
         gridSize={gridSize} 
         setGridSize={setGridSize} 
         cardType={cardType}
+        disabled={isDisabled}
       />
       <CardSettings
         title={title}
@@ -68,21 +72,23 @@ export const CardControls = ({
         setShowTitle={setShowTitle}
         includeFreeSpace={includeFreeSpace}
         setIncludeFreeSpace={setIncludeFreeSpace}
+        disabled={isDisabled}
       />
       {cardType === "custom" && (
-        <AIGenerator setBingoContent={setBingoContent} />
+        <AIGenerator setBingoContent={setBingoContent} disabled={isDisabled} />
       )}
-      <BackgroundUploader onBackgroundChange={onBackgroundChange} />
+      <BackgroundUploader onBackgroundChange={onBackgroundChange} disabled={isDisabled} />
       <ColorSlider
         backgroundColor={backgroundColor}
         onBackgroundColorChange={setBackgroundColor}
+        disabled={isDisabled}
       />
       <div className="mt-4 space-y-2">
         <Button
           variant="secondary"
           className="w-full"
           onClick={onSave}
-          disabled={isSaving}
+          disabled={isSaving || isDisabled}
         >
           {isSaving ? "Saving..." : "Save Card"}
         </Button>
@@ -90,7 +96,7 @@ export const CardControls = ({
           variant="outline"
           className="w-full"
           onClick={onDownload}
-          disabled={isDownloading}
+          disabled={isDownloading || isDisabled}
         >
           <Download className="mr-2 h-4 w-4" />
           {isDownloading ? "Downloading..." : "Download Card"}
