@@ -2,6 +2,7 @@ import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { Check } from "lucide-react";
 import { SubscribeButton } from "@/components/stripe/SubscribeButton";
+import { FreeBingoGenerator } from "@/components/bingo/FreeBingoGenerator";
 
 export default function Landing() {
   return (
@@ -74,6 +75,23 @@ export default function Landing() {
                   </div>
                 </div>
               </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Free Bingo Generator Section */}
+        <div className="py-24 bg-[#EEF6FF]">
+          <div className="mx-auto max-w-7xl px-6 lg:px-8">
+            <div className="mx-auto max-w-2xl text-center">
+              <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
+                Try Our Free Bingo Card Generator
+              </h2>
+              <p className="mt-4 text-lg text-gray-600">
+                Create up to 3 bingo cards per day with our free generator. No registration required!
+              </p>
+            </div>
+            <div className="mt-16">
+              <FreeBingoGenerator />
             </div>
           </div>
         </div>

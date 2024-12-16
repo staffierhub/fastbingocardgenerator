@@ -93,6 +93,27 @@ export type Database = {
         }
         Relationships: []
       }
+      daily_generator_usage: {
+        Row: {
+          id: string
+          ip_address: string
+          used_at: string
+          used_date: string | null
+        }
+        Insert: {
+          id?: string
+          ip_address: string
+          used_at?: string
+          used_date?: string | null
+        }
+        Update: {
+          id?: string
+          ip_address?: string
+          used_at?: string
+          used_date?: string | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
