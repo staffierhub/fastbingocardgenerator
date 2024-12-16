@@ -111,7 +111,11 @@ export default function Index() {
       <main className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-[350px,1fr] gap-8">
         <div className="space-y-6">
           <Card className="p-6">
-            <CardTypeSelector cardType={cardType} setCardType={setCardType} />
+            <CardTypeSelector 
+              cardType={cardType} 
+              setCardType={setCardType}
+              setGridSize={setGridSize}
+            />
             <GridSizeSelector 
               gridSize={gridSize} 
               setGridSize={setGridSize} 

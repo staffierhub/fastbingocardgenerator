@@ -3,9 +3,19 @@ import { Button } from "@/components/ui/button";
 interface CardTypeSelectorProps {
   cardType: string;
   setCardType: (type: string) => void;
+  setGridSize: (size: string) => void;
 }
 
-export const CardTypeSelector = ({ cardType, setCardType }: CardTypeSelectorProps) => {
+export const CardTypeSelector = ({ cardType, setCardType, setGridSize }: CardTypeSelectorProps) => {
+  const handleTypeChange = (type: string) => {
+    setCardType(type);
+    if (type === "custom") {
+      setGridSize("3x3");
+    } else {
+      setGridSize("75-ball");
+    }
+  };
+
   return (
     <div>
       <h2 className="text-xl font-semibold mb-4">Card Type</h2>
@@ -16,7 +26,7 @@ export const CardTypeSelector = ({ cardType, setCardType }: CardTypeSelectorProp
       <div className="grid grid-cols-2 gap-4 mb-6">
         <Button
           variant={cardType === "custom" ? "default" : "outline"}
-          onClick={() => setCardType("custom")}
+          onClick={() => handleTypeChange("custom")}
           className="h-24"
         >
           <div className="text-center">
@@ -26,7 +36,7 @@ export const CardTypeSelector = ({ cardType, setCardType }: CardTypeSelectorProp
         </Button>
         <Button
           variant={cardType === "traditional" ? "default" : "outline"}
-          onClick={() => setCardType("traditional")}
+          onClick={() => handleTypeChange("traditional")}
           className="h-24"
         >
           <div className="text-center">
