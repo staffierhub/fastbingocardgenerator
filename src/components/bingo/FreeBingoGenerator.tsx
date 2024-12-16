@@ -9,12 +9,12 @@ import { useRef } from "react";
 export const FreeBingoGenerator = () => {
   const { toast } = useToast();
   const [cardType, setCardType] = useState("custom");
-  const [gridSize, setGridSize] = useState("5x5");
+  const [gridSize, setGridSize] = useState("3x3");
   const [title, setTitle] = useState("My Bingo Card");
   const [showTitle, setShowTitle] = useState(true);
   const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
-  const [bingoContent, setBingoContent] = useState<string[]>([]);
-  const [showCard, setShowCard] = useState(false);
+  const [bingoContent, setBingoContent] = useState<string[]>(Array(9).fill("")); // Default 3x3 grid content
+  const [showCard, setShowCard] = useState(true); // Changed to true to show default card
   const [isGenerating, setIsGenerating] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [backgroundUrl, setBackgroundUrl] = useState<string>("");
@@ -130,20 +130,18 @@ export const FreeBingoGenerator = () => {
         />
       </div>
 
-      {showCard && (
-        <div ref={cardRef}>
-          <BingoCard
-            title={title}
-            showTitle={showTitle}
-            includeFreeSpace={includeFreeSpace}
-            bingoContent={bingoContent}
-            gridSize={gridSize}
-            cardType={cardType}
-            backgroundUrl={backgroundUrl}
-            backgroundColor={backgroundColor}
-          />
-        </div>
-      )}
+      <div ref={cardRef}>
+        <BingoCard
+          title={title}
+          showTitle={showTitle}
+          includeFreeSpace={includeFreeSpace}
+          bingoContent={bingoContent}
+          gridSize={gridSize}
+          cardType={cardType}
+          backgroundUrl={backgroundUrl}
+          backgroundColor={backgroundColor}
+        />
+      </div>
     </div>
   );
 };
