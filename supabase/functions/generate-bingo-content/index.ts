@@ -14,9 +14,8 @@ serve(async (req) => {
   }
 
   try {
-    const { theme, gridSize = "3x3" } = await req.json();
-    const size = parseInt(gridSize.split('x')[0]);
-    const totalItems = size * size;
+    const { theme } = await req.json();
+    console.log('Received theme:', theme);
 
     const response = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
@@ -29,32 +28,65 @@ serve(async (req) => {
         messages: [
           {
             role: 'system',
-            content: `You are a helpful assistant that generates bingo card content. Generate content as a JSON array of ${totalItems} unique strings (if free space is enabled, one less item will be needed).`
+            content: 'You are a helpful assistant that generates content for bingo cards. Generate content as an array of strings.'
           },
           {
             role: 'user',
-            content: `Generate ${totalItems} unique bingo squares content for a ${theme} themed bingo game. Return only a JSON array of strings, nothing else.`
+            content: `Generate 25 unique, fun, and engaging bingo squares content for a ${theme} themed bingo game. Each item should be concise (2-4 words). Return ONLY an array of strings, no additional text or formatting.`
           }
         ],
       }),
     });
 
     const data = await response.json();
-    let content = data.choices[0].message.content;
-    
-    // Ensure the response is properly parsed as JSON
-    if (typeof content === 'string') {
-      content = JSON.parse(content);
+    console.log('OpenAI response:', data);
+
+    if (!data.choices?.[0]?.message?.content) {
+      throw new Error('Invalid response from OpenAI');
     }
 
-    return new Response(JSON.stringify({ content }), {
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    let content;
+    try {
+      // Try to parse the content as JSON first
+      content = JSON.parse(data.choices[0].message.content.trim());
+    } catch (e) {
+      // If parsing fails, split the text into an array
+      content = data.choices[0].message.content
+        .trim()
+        .split('\n')
+        .map(item => item.replace(/^\d+\.\s*|-\s*|"\s*|\s*"$/g, '').trim())
+        .filter(item => item.length > 0);
+    }
+
+    if (!Array.isArray(content)) {
+      throw new Error('Content is not an array');
+    }
+
+    console.log('Processed content:', content);
+
+    return new Response(
+      JSON.stringify({ content }),
+      { 
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
   } catch (error) {
     console.error('Error in generate-bingo-content function:', error);
-    return new Response(JSON.stringify({ error: error.message }), {
-      status: 500,
-      headers: { ...corsHeaders, 'Content-Type': 'application/json' },
-    });
+    return new Response(
+      JSON.stringify({ 
+        error: error.message,
+        details: error.toString()
+      }),
+      {
+        status: 500,
+        headers: { 
+          ...corsHeaders,
+          'Content-Type': 'application/json'
+        }
+      }
+    );
   }
 });
