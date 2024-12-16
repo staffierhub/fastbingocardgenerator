@@ -1,1 +1,19 @@
 project_id = "wlhopipxemzceplljzsy"
+
+[api]
+enabled = true
+url = "https://wlhopipxemzceplljzsy.supabase.co"
+
+[db]
+enabled = true
+
+[realtime]
+enabled = true
+
+[storage]
+enabled = true
+
+[edge_functions]
+enabled = true
+[edge_functions.stripe-webhook]
+verify_jwt = false
