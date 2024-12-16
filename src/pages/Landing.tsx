@@ -82,17 +82,15 @@ export default function Landing() {
         {/* Free Bingo Generator Section */}
         <div className="py-24 bg-[#EEF6FF]">
           <div className="mx-auto max-w-7xl px-6 lg:px-8">
-            <div className="mx-auto max-w-2xl text-center">
+            <div className="mx-auto max-w-2xl text-center mb-16">
               <h2 className="text-3xl font-bold tracking-tight text-gray-900 sm:text-4xl">
                 Try Our Free Bingo Card Generator
               </h2>
               <p className="mt-4 text-lg text-gray-600">
-                Create up to 3 bingo cards per day with our free generator. No registration required!
+                Create one bingo card per day with our free generator. No registration required!
               </p>
             </div>
-            <div className="mt-16">
-              <FreeBingoGenerator />
-            </div>
+            <FreeBingoGenerator />
           </div>
         </div>
 

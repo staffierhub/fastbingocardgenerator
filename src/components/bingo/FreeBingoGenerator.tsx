@@ -1,117 +1,149 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { useToast } from "@/components/ui/use-toast";
 import { BingoCard } from "./BingoCard";
 import { supabase } from "@/integrations/supabase/client";
+import { CardControls } from "./CardControls";
+import html2canvas from 'html2canvas';
+import { useRef } from "react";
 
 export const FreeBingoGenerator = () => {
   const { toast } = useToast();
-  const [theme, setTheme] = useState("");
-  const [isGenerating, setIsGenerating] = useState(false);
+  const [cardType, setCardType] = useState("custom");
+  const [gridSize, setGridSize] = useState("5x5");
+  const [title, setTitle] = useState("My Bingo Card");
+  const [showTitle, setShowTitle] = useState(true);
+  const [includeFreeSpace, setIncludeFreeSpace] = useState(true);
   const [bingoContent, setBingoContent] = useState<string[]>([]);
   const [showCard, setShowCard] = useState(false);
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
+  const [backgroundUrl, setBackgroundUrl] = useState<string>("");
+  const [backgroundColor, setBackgroundColor] = useState("#F7C052");
+  const cardRef = useRef<HTMLDivElement>(null);
 
-  const generateBingoContent = async () => {
-    if (!theme.trim()) {
-      toast({
-        title: "Please enter a theme",
-        variant: "destructive",
-        duration: 2000,
-      });
-      return;
-    }
-
-    setIsGenerating(true);
+  const handleDownload = async () => {
+    if (!cardRef.current) return;
+    
+    setIsDownloading(true);
     try {
-      // First check if the user has reached their daily limit
-      const { data: usageData, error: usageError } = await supabase
-        .from('daily_generator_usage')
-        .select('*')
-        .eq('ip_address', await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip))
-        .eq('used_date', new Date().toISOString().split('T')[0]);
-
-      if (usageError) throw usageError;
-
-      if (usageData && usageData.length >= 3) {
-        toast({
-          title: "Daily limit reached",
-          description: "You can generate up to 3 bingo cards per day. Sign up for unlimited cards!",
-          variant: "destructive",
-          duration: 3000,
-        });
-        return;
-      }
-
-      const { data, error } = await supabase.functions.invoke('generate-bingo-content', {
-        body: { theme }
+      const canvas = await html2canvas(cardRef.current, {
+        backgroundColor: null,
+        scale: 2,
       });
-
-      if (error) throw error;
-
-      // Record the usage
-      const { error: insertError } = await supabase
-        .from('daily_generator_usage')
-        .insert([
-          {
-            ip_address: await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip)
-          }
-        ]);
-
-      if (insertError) throw insertError;
-
-      setBingoContent(data.content);
-      setShowCard(true);
+      
+      const link = document.createElement('a');
+      link.download = `${title.toLowerCase().replace(/\s+/g, '-')}-bingo-card.png`;
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+      
       toast({
-        title: "Bingo card generated!",
+        title: "Card downloaded successfully!",
         duration: 2000,
       });
     } catch (error) {
-      console.error("Error generating bingo content:", error);
+      console.error('Error downloading card:', error);
       toast({
-        title: "Error generating bingo content",
-        description: "Please try again later",
+        title: "Error downloading card",
         variant: "destructive",
         duration: 2000,
       });
     } finally {
-      setIsGenerating(false);
+      setIsDownloading(false);
+    }
+  };
+
+  const checkDailyLimit = async () => {
+    try {
+      const ip = await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip);
+      const { data: usageData, error: usageError } = await supabase
+        .from('daily_generator_usage')
+        .select('*')
+        .eq('ip_address', ip)
+        .eq('used_date', new Date().toISOString().split('T')[0]);
+
+      if (usageError) throw usageError;
+
+      if (usageData && usageData.length >= 1) {
+        toast({
+          title: "Daily limit reached",
+          description: "You can generate 1 bingo card per day. Sign up for unlimited cards!",
+          variant: "destructive",
+          duration: 3000,
+        });
+        return false;
+      }
+      return true;
+    } catch (error) {
+      console.error("Error checking daily limit:", error);
+      return false;
+    }
+  };
+
+  const recordUsage = async () => {
+    try {
+      const ip = await fetch('https://api.ipify.org?format=json').then(res => res.json()).then(data => data.ip);
+      const { error: insertError } = await supabase
+        .from('daily_generator_usage')
+        .insert([{ ip_address: ip }]);
+
+      if (insertError) throw insertError;
+    } catch (error) {
+      console.error("Error recording usage:", error);
     }
   };
 
   return (
-    <div className="max-w-4xl mx-auto">
-      <div className="bg-white p-6 rounded-lg shadow-lg">
-        <div className="mb-6">
-          <Input
-            placeholder="Enter a theme for your bingo card (e.g., 'Office Meeting', 'Baby Shower')"
-            value={theme}
-            onChange={(e) => setTheme(e.target.value)}
-            className="mb-4"
-          />
-          <Button
-            onClick={generateBingoContent}
-            disabled={isGenerating}
-            className="w-full bg-[#5BB6EE] hover:bg-[#4A92BE]"
-          >
-            {isGenerating ? "Generating..." : "Generate Free Bingo Card"}
-          </Button>
-        </div>
-
-        {showCard && (
-          <div className="mt-8">
-            <BingoCard
-              title={theme}
-              showTitle={true}
-              includeFreeSpace={true}
-              bingoContent={bingoContent}
-              gridSize="5x5"
-              cardType="custom"
-              backgroundColor="#F7C052"
-            />
-          </div>
-        )}
+    <div className="max-w-7xl mx-auto p-4 grid grid-cols-1 md:grid-cols-[350px,1fr] gap-8">
+      <div className="space-y-6">
+        <CardControls
+          cardType={cardType}
+          setCardType={setCardType}
+          gridSize={gridSize}
+          setGridSize={setGridSize}
+          title={title}
+          setTitle={setTitle}
+          showTitle={showTitle}
+          setShowTitle={setShowTitle}
+          includeFreeSpace={includeFreeSpace}
+          setIncludeFreeSpace={setIncludeFreeSpace}
+          setBingoContent={async (content) => {
+            const canProceed = await checkDailyLimit();
+            if (!canProceed) return;
+            
+            setBingoContent(content);
+            setShowCard(true);
+            await recordUsage();
+          }}
+          onBackgroundChange={setBackgroundUrl}
+          backgroundColor={backgroundColor}
+          setBackgroundColor={setBackgroundColor}
+          onSave={() => {
+            toast({
+              title: "Sign up to save cards!",
+              description: "Create an account to save and manage your bingo cards.",
+              duration: 3000,
+            });
+          }}
+          onDownload={handleDownload}
+          isSaving={false}
+          isDownloading={isDownloading}
+        />
       </div>
+
+      {showCard && (
+        <div ref={cardRef}>
+          <BingoCard
+            title={title}
+            showTitle={showTitle}
+            includeFreeSpace={includeFreeSpace}
+            bingoContent={bingoContent}
+            gridSize={gridSize}
+            cardType={cardType}
+            backgroundUrl={backgroundUrl}
+            backgroundColor={backgroundColor}
+          />
+        </div>
+      )}
     </div>
   );
 };
