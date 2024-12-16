@@ -61,6 +61,25 @@ export const BingoCard = ({
     setGrid(newGrid.map(cell => [cell]));
   };
 
+  const toggleFreeSpace = (index: number) => {
+    const newGrid = [...grid.flat()];
+    // Remove existing free space if there is one
+    const currentFreeSpaceIndex = newGrid.findIndex(cell => cell.isFreeSpace);
+    if (currentFreeSpaceIndex !== -1) {
+      newGrid[currentFreeSpaceIndex] = {
+        ...newGrid[currentFreeSpaceIndex],
+        isFreeSpace: false
+      };
+    }
+    // Toggle the clicked cell
+    newGrid[index] = {
+      ...newGrid[index],
+      isFreeSpace: !newGrid[index].isFreeSpace,
+      value: newGrid[index].isFreeSpace ? newGrid[index].value : "FREE"
+    };
+    setGrid(newGrid.map(cell => [cell]));
+  };
+
   return (
     <Card className="p-8 bg-[#F7C052]">
       <div className="aspect-square">
@@ -79,17 +98,19 @@ export const BingoCard = ({
               key={index}
               className={`
                 bg-white rounded-lg flex items-center justify-center p-2 
-                text-center text-sm border-2 border-gray-200
+                text-center text-sm border-2 border-gray-200 relative
                 ${cell.isBlank ? 'bg-gray-100' : ''}
                 ${cell.isFreeSpace ? 'bg-yellow-100' : ''}
+                cursor-pointer
               `}
+              onClick={() => includeFreeSpace && toggleFreeSpace(index)}
             >
               <input
                 type="text"
                 value={cell.value}
                 onChange={(e) => handleCellEdit(index, e.target.value)}
-                className="w-full h-full text-center bg-transparent focus:outline-none"
-                disabled={cell.isFreeSpace}
+                className="w-full h-full text-center bg-transparent focus:outline-none cursor-text"
+                onClick={(e) => e.stopPropagation()}
               />
             </div>
           ))}
