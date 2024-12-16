@@ -21,56 +21,57 @@ serve(async (req) => {
   try {
     console.log('Starting checkout process...')
     
-    // Get the authorization header
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      throw new Error('No authorization header')
+    let email: string | undefined;
+    let customer_id: string | undefined;
+
+    // Try to get user email if they're authenticated
+    try {
+      const authHeader = req.headers.get('Authorization');
+      if (authHeader) {
+        const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession();
+        if (!sessionError && session) {
+          email = session.user.email;
+          console.log('Found authenticated user email:', email);
+        }
+      }
+    } catch (error) {
+      console.log('No authenticated user found, continuing as guest');
     }
-
-    // Get the current session
-    const { data: { session }, error: sessionError } = await supabaseClient.auth.getSession()
-    if (sessionError) throw sessionError
-    if (!session) throw new Error('No active session')
-
-    const email = session.user.email
-    if (!email) {
-      throw new Error('No email found')
-    }
-
-    console.log('Found user email:', email)
 
     const stripe = new Stripe(Deno.env.get('STRIPE_SECRET_KEY') || '', {
       apiVersion: '2023-10-16',
     })
 
-    console.log('Checking for existing customer...')
-    const customers = await stripe.customers.list({
-      email: email,
-      limit: 1
-    })
-
-    let customer_id = undefined
-    if (customers.data.length > 0) {
-      customer_id = customers.data[0].id
-      console.log('Found existing customer:', customer_id)
-      
-      // check if already subscribed to this price
-      const subscriptions = await stripe.subscriptions.list({
-        customer: customers.data[0].id,
-        status: 'active',
-        price: 'price_1QVGtkAtzaF3EPGiOo9IAxKJ',
+    // If we have an email, check for existing customer
+    if (email) {
+      console.log('Checking for existing customer...')
+      const customers = await stripe.customers.list({
+        email: email,
         limit: 1
       })
 
-      if (subscriptions.data.length > 0) {
-        throw new Error("You are already subscribed to this plan")
+      if (customers.data.length > 0) {
+        customer_id = customers.data[0].id;
+        console.log('Found existing customer:', customer_id);
+        
+        // check if already subscribed to this price
+        const subscriptions = await stripe.subscriptions.list({
+          customer: customers.data[0].id,
+          status: 'active',
+          price: 'price_1QVGtkAtzaF3EPGiOo9IAxKJ',
+          limit: 1
+        })
+
+        if (subscriptions.data.length > 0) {
+          throw new Error("You are already subscribed to this plan");
+        }
       }
     }
 
     console.log('Creating checkout session...')
     const session = await stripe.checkout.sessions.create({
       customer: customer_id,
-      customer_email: customer_id ? undefined : email,
+      customer_email: customer_id ? undefined : email, // Only set if we have an email but no customer
       line_items: [
         {
           price: 'price_1QVGtkAtzaF3EPGiOo9IAxKJ',
@@ -80,6 +81,7 @@ serve(async (req) => {
       mode: 'subscription',
       success_url: `${req.headers.get('origin')}/generator`,
       cancel_url: `${req.headers.get('origin')}/generator`,
+      allow_promotion_codes: true,
     })
 
     console.log('Checkout session created:', session.id)
