@@ -30,7 +30,7 @@ export function Navigation() {
   return (
     <div className="w-full border-b mb-8">
       <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
-        <Link to="/" className="text-2xl font-bold text-[#5BB6EE] font-['__Inter_e66fe9', '__Inter_Fallback_e66fe9']">
+        <Link to="/" className="text-2xl font-bold text-gray-900 font-['__Inter_e66fe9', '__Inter_Fallback_e66fe9']">
           instantbingogenerator.com
         </Link>
         
